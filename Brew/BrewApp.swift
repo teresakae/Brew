@@ -11,7 +11,7 @@ import SwiftUI
 struct BrewApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            TimerView()
         }
     }
 }
