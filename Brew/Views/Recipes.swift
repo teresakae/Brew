@@ -7,15 +7,6 @@
 
 import SwiftUI
 
-// Model for each step
-struct BrewStep: Identifiable {
-    let id = UUID()
-    var recipeName: String = ""
-    var instructions: String = ""
-    var minutes: String = ""
-    var seconds: String = ""
-}
-
 struct Recipes: View {
     @State private var title = ""
     @State private var description = ""

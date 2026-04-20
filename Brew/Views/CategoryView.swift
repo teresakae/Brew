@@ -1,12 +1,5 @@
 import SwiftUI
 
-struct RecipeItem: Identifiable {
-    let id = UUID()
-    let name: String
-    let category: String
-    let icon: String
-}
-
 struct Category: View {
     @Environment(\.dismiss) private var dismiss
     @State private var selected = "All"

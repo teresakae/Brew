@@ -69,7 +69,6 @@ final class BrewTimerViewModel {
     }
 
     // MARK: - Public Controls
-
     func start() {
         guard timerState == .idle || timerState == .paused else { return }
         segmentStartDate = .now
