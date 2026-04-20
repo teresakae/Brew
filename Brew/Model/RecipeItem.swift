@@ -12,4 +12,7 @@ struct RecipeItem: Identifiable {
     let name: String
     let category: String
     let icon: String
+    let phases: [BrewPhase]
+    let coffeeGrams: Int
+    let waterMl: Int
 }
