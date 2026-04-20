@@ -152,7 +152,7 @@ final class BrewTimerViewModel {
                 timerState = .finished
             } else {
                 playPhaseSound()
-                try? await Task.sleep(for: .seconds(1.5))
+                try? await Task.sleep(for: .seconds(0))
                 currentPhaseIndex += 1
                 priorElapsed      = 0
                 segmentStartDate  = .now

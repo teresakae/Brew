@@ -88,7 +88,7 @@ struct PhaseTrackerView: View {
                 
                         .id(index)
                         .onTapGesture {
-                            withAnimation(.easeInOut(duration: 0.25)) {
+                            withAnimation(.easeInOut(duration: 0)) {
                                 viewModel.jumpToPhase(at: index)
                             }
                         }
@@ -142,7 +142,7 @@ struct PhaseChipView: View {
         }
         .padding(.horizontal, 4)
         .frame(minWidth: 72)
-        .animation(.easeInOut(duration: 0.2), value: isActive)
+        .animation(.easeInOut(duration: 0.1), value: isActive)
     }
 
     private var labelColor: Color {
@@ -285,8 +285,8 @@ struct TimerView: View {
 
                     // Horizontal phase tracker with snap scroll
                     PhaseTrackerView(viewModel: viewModel)
-                        .padding(.bottom, 20)
-
+                        .padding(.bottom, 75)
+                        
                     // Phase instruction (Native)
                     Text(instructionText)
                         .font(.callout)
@@ -314,7 +314,7 @@ struct TimerView: View {
                         .transition(.scale.combined(with: .opacity))
                 }
             }
-            .animation(.easeInOut(duration: 0.3), value: viewModel.timerState)
+            .animation(.easeInOut(duration: 0.1), value: viewModel.timerState)
             .navigationTitle(recipeName)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

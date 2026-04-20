@@ -39,12 +39,11 @@ struct BrewPhase: Identifiable {
 }
 
 // MARK: - Sample Data
-
 extension BrewPhase {
     static let frenchPressSample: [BrewPhase] = [
         BrewPhase(
             name: "Bloom",
-                duration: 30,
+                duration: 3,
             instruction: "Pour 50ml of water in circular motion, let CO₂ escape",
             ingredientAmount: 50,
             soundName: "bloom_chime"
