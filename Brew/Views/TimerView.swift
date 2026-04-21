@@ -330,6 +330,10 @@ struct TimerView: View {
                 Recipes(mode: .edit, item: activeRecipe, store: store)
                     .presentationDragIndicator(.visible)
             }
+            .sheet(isPresented: $showAddRecipe) {
+                Recipes(mode: .add, store: store)
+                    .presentationDragIndicator(.visible)
+            }
         }
         .preferredColorScheme(.dark)
         .tint(Color(red: 0.73, green: 0.84, blue: 0.18))

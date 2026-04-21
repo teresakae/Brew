@@ -35,7 +35,7 @@ struct Recipes: View {
                         Text("Aero Press").tag("Aero Press")
                         Text("Moka Pot").tag("Moka Pot")
                         Text("Espresso").tag("Espresso")
-                        Text("Personal").tag("Personal")
+                        Text("Others").tag("Others")
                     }
                 }
                 Section("Ingredients") {
@@ -128,7 +128,11 @@ struct Recipes: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") { dismiss() }
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                    }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
