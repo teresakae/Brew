@@ -9,6 +9,7 @@ import SwiftUI
 
 struct Recipes: View {
     var mode: RecipeMode = .add
+    var item: RecipeItem? = nil
     let store: RecipeStore
 
     @Environment(\.dismiss) private var dismiss
@@ -139,6 +140,21 @@ struct Recipes: View {
                 }
             }
             .tint(Color(red: 0.73, green: 0.84, blue: 0.18))
+            .onAppear {
+                guard let item else { return }
+                recipe.title = item.name
+                recipe.category = item.category
+                recipe.coffeeDose = String(item.coffeeGrams)
+                recipe.waterDose = String(item.waterMl)
+                recipe.steps = item.phases.map { phase in
+                    var step = BrewStep()
+                    step.recipeName = phase.name
+                    step.instructions = phase.instruction
+                    step.minutes = String(Int(phase.duration) / 60)
+                    step.seconds = String(Int(phase.duration) % 60)
+                    return step
+                }
+            }
             .alert("Delete Recipe?", isPresented: $showDeleteConfirmation) {
                 Button("Cancel", role: .cancel) { }
                 Button("Delete", role: .destructive) { deleteRecipe() }

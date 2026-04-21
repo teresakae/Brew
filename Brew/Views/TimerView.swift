@@ -245,7 +245,7 @@ struct FinishedBannerView: View {
 // MARK: - Timer View
 struct TimerView: View {
     let store: RecipeStore
-
+    @State private var activeRecipe: RecipeItem = RecipeItem.sampleData[0]
     @State private var viewModel = BrewTimerViewModel(phases: BrewPhase.frenchPressSample)
     @State private var showRecipeList = false
     @State private var showEditRecipe = false
@@ -319,6 +319,7 @@ struct TimerView: View {
             .sheet(isPresented: $showRecipeList) {
                 Category(currentRecipe: activeRecipeName, store: store) { selected in
                     viewModel         = BrewTimerViewModel(phases: selected.phases)
+                    activeRecipe = selected
                     activeRecipeName  = selected.name
                     activeCoffeeGrams = selected.coffeeGrams
                     activeWaterMl     = selected.waterMl
@@ -326,11 +327,7 @@ struct TimerView: View {
                 .presentationDragIndicator(.visible)
             }
             .sheet(isPresented: $showEditRecipe) {
-                Recipes(mode: .edit, store: store)
-                    .presentationDragIndicator(.visible)
-            }
-            .sheet(isPresented: $showAddRecipe) {
-                Recipes(mode: .add, store: store)
+                Recipes(mode: .edit, item: activeRecipe, store: store)
                     .presentationDragIndicator(.visible)
             }
         }
