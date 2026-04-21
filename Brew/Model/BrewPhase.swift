@@ -70,4 +70,58 @@ extension BrewPhase {
             soundName: nil
         ),
     ]
+    
+    static let v60Sample: [BrewPhase] = [
+        BrewPhase(
+            name: "Bloom",
+            duration: 30,
+            instruction: "Pour 50ml in slow circles, let the bed expand",
+            ingredientAmount: 50
+        ),
+        BrewPhase(
+            name: "First Pour",
+            duration: 30,
+            instruction: "Pour to 150ml total in steady spirals from center out",
+            ingredientAmount: 100
+        ),
+        BrewPhase(
+            name: "Second Pour",
+            duration: 30,
+            instruction: "Pour to 250ml, maintain a slow steady stream",
+            ingredientAmount: 100
+        ),
+        BrewPhase(
+            name: "Drawdown",
+            duration: 60,
+            instruction: "Let remaining water drain fully through the filter",
+            ingredientAmount: nil
+        ),
+    ]
+
+    static let aeropressSample: [BrewPhase] = [
+        BrewPhase(
+            name: "Rinse",
+            duration: 15,
+            instruction: "Rinse paper filter with hot water, discard rinse water",
+            ingredientAmount: nil
+        ),
+        BrewPhase(
+            name: "Bloom",
+            duration: 30,
+            instruction: "Add 40ml water, stir gently for 10 seconds",
+            ingredientAmount: 40
+        ),
+        BrewPhase(
+            name: "Fill",
+            duration: 30,
+            instruction: "Pour remaining water to 200ml total",
+            ingredientAmount: 160
+        ),
+        BrewPhase(
+            name: "Press",
+            duration: 30,
+            instruction: "Press slowly and steadily for 30 seconds, stop at hiss",
+            ingredientAmount: nil
+        ),
+    ]
 }

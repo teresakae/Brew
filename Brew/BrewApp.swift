@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct BrewApp: App {
+    @State private var store = RecipeStore()
+
     var body: some Scene {
         WindowGroup {
-            TimerView()
+            TimerView(store: store)
         }
     }
 }

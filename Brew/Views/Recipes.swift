@@ -8,7 +8,10 @@
 import SwiftUI
 
 struct Recipes: View {
-    var mode: RecipeMode = .edit
+    var mode: RecipeMode = .add
+    let store: RecipeStore
+
+    @Environment(\.dismiss) private var dismiss
     @State private var recipe = RecipeData()
     @State private var showDeleteConfirmation = false
 
@@ -25,19 +28,28 @@ struct Recipes: View {
             Form {
                 Section("Basics") {
                     TextField("Recipe Name", text: $recipe.title)
-                    Picker("Category", selection: $recipe.category) 
-                    {
+                    Picker("Category", selection: $recipe.category) {
                         Text("V60").tag("V60")
+                        Text("French Press").tag("French Press")
+                        Text("Aero Press").tag("Aero Press")
+                        Text("Moka Pot").tag("Moka Pot")
+                        Text("Espresso").tag("Espresso")
                         Text("Personal").tag("Personal")
                     }
                 }
                 Section("Ingredients") {
-                    TextField("Coffee Dose", text: $recipe.coffeeDose)
-                    TextField("Water Dose", text: $recipe.waterDose)
+                    TextField("Coffee Dose (g)", text: $recipe.coffeeDose)
+                        .keyboardType(.numberPad)
+                    TextField("Water Dose (ml)", text: $recipe.waterDose)
+                        .keyboardType(.numberPad)
                 }
                 Section("Details (optional)") {
                     Picker("Grind Size", selection: $recipe.grindSize) {
                         Text("Very fine").tag("Very fine")
+                        Text("Fine").tag("Fine")
+                        Text("Medium fine").tag("Medium fine")
+                        Text("Medium").tag("Medium")
+                        Text("Coarse").tag("Coarse")
                     }
                     TextField("Water TDS", text: $recipe.waterTDS)
                     TextField("Bean Origin", text: $recipe.beanOrigin)
@@ -97,14 +109,16 @@ struct Recipes: View {
                     }
                 }
 
-                Section {
-                    Button(role: .destructive) {
-                        showDeleteConfirmation = true
-                    } label: {
-                        HStack {
-                            Spacer()
-                            Text("Delete Recipe")
-                            Spacer()
+                if mode == .edit {
+                    Section {
+                        Button(role: .destructive) {
+                            showDeleteConfirmation = true
+                        } label: {
+                            HStack {
+                                Spacer()
+                                Text("Delete Recipe")
+                                Spacer()
+                            }
                         }
                     }
                 }
@@ -113,12 +127,13 @@ struct Recipes: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button {} label: {
-                        Image(systemName: "chevron.backward")
-                    }
+                    Button("Cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button { addStep() } label: {
+                    Button {
+                        saveRecipe()
+                        dismiss()
+                    } label: {
                         Image(systemName: "checkmark")
                     }
                 }
@@ -131,6 +146,21 @@ struct Recipes: View {
                 Text("Are you sure you want to delete this recipe? This action cannot be undone.")
             }
         }
+    }
+
+    // MARK: - Helpers
+
+    private func saveRecipe() {
+        let phases = recipe.steps.map { $0.toBrewPhase() }
+        let newItem = RecipeItem(
+            name: recipe.title.isEmpty ? "Untitled Recipe" : recipe.title,
+            category: recipe.category,
+            icon: "cup.and.saucer.fill",
+            phases: phases,
+            coffeeGrams: Int(recipe.coffeeDose) ?? 0,
+            waterMl: Int(recipe.waterDose) ?? 0
+        )
+        store.recipes.append(newItem)
     }
 
     private func binding(for step: BrewStep) -> Binding<BrewStep> {
@@ -147,5 +177,5 @@ struct Recipes: View {
 }
 
 #Preview {
-    Recipes()
+    Recipes(mode: .add, store: RecipeStore())
 }

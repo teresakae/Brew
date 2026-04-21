@@ -14,3 +14,14 @@ struct BrewStep: Identifiable {
     var minutes: String = ""
     var seconds: String = ""
 }
+
+extension BrewStep {
+    func toBrewPhase() -> BrewPhase {
+        let duration = (Int(minutes) ?? 0) * 60 + (Int(seconds) ?? 0)
+        return BrewPhase(
+            name: recipeName,
+            duration: TimeInterval(duration),
+            instruction: instructions
+        )
+    }
+}

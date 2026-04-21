@@ -1,26 +1,24 @@
+//
+//  Category.swift
+//  Brew
+//
+//  Created by Teresa Kae on 20/04/26.
+//
+
 import SwiftUI
 
 struct Category: View {
     @Environment(\.dismiss) private var dismiss
     @State private var selected = "All"
-    @State private var currentRecipe = "Classic French Press"
+    let currentRecipe: String
+
+    let store: RecipeStore
     var onSelect: (RecipeItem) -> Void
 
     let filterCategories = ["All", "Pour Over", "French Press", "Aero Press", "Moka Pot", "Espresso", "Others"]
 
-    let recipes: [RecipeItem] = [
-        RecipeItem(name: "V60",                  category: "Pour Over",    icon: "cup.and.saucer.fill", phases: [], coffeeGrams: 0, waterMl: 0),
-        RecipeItem(name: "Chemex",               category: "Pour Over",    icon: "cup.and.saucer.fill", phases: [], coffeeGrams: 0, waterMl: 0),
-        RecipeItem(name: "Classic French Press", category: "French Press", icon: "cup.and.saucer.fill", phases: BrewPhase.frenchPressSample, coffeeGrams: 25, waterMl: 250),
-        RecipeItem(name: "Classic Aero Press",   category: "Aero Press",   icon: "cup.and.saucer.fill", phases: [], coffeeGrams: 0, waterMl: 0),
-        RecipeItem(name: "Inverted",             category: "Aero Press",   icon: "cup.and.saucer.fill", phases: [], coffeeGrams: 0, waterMl: 0),
-        RecipeItem(name: "Classic Moka",         category: "Moka Pot",     icon: "cup.and.saucer.fill", phases: [], coffeeGrams: 0, waterMl: 0),
-        RecipeItem(name: "Single Shot",          category: "Espresso",     icon: "cup.and.saucer.fill", phases: [], coffeeGrams: 0, waterMl: 0),
-        RecipeItem(name: "Double Shot",          category: "Espresso",     icon: "cup.and.saucer.fill", phases: [], coffeeGrams: 0, waterMl: 0),
-    ]
-
     var filteredRecipes: [RecipeItem] {
-        selected == "All" ? recipes : recipes.filter { $0.category == selected }
+        selected == "All" ? store.recipes : store.recipes.filter { $0.category == selected }
     }
 
     let accent = Color(red: 0.765, green: 0.839, blue: 0.427)
@@ -81,7 +79,6 @@ struct Category: View {
                     .padding(.vertical, 4)
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        currentRecipe = recipe.name
                         onSelect(recipe)
                         dismiss()
                     }
@@ -99,12 +96,4 @@ struct Category: View {
             }
         }
     }
-}
-
-#Preview {
-    Color.black.ignoresSafeArea()
-        .sheet(isPresented: .constant(true)) {
-            Category { _ in }
-                .presentationDragIndicator(.visible)
-        }
 }
