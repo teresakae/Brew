@@ -8,8 +8,7 @@
 import Foundation
 import SwiftUI
 
-// MARK: - Countdown Ring
-// TimelineView + J (ring math/wall-clock diffing)
+// MARK: - Countdown Ring - J (ring math)
 struct CountdownRingView: View {
     let viewModel: BrewTimerViewModel
 
@@ -75,19 +74,22 @@ struct PhaseTrackerView: View {
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(spacing: 20) {
-                    ForEach(Array(viewModel.phases.enumerated()), id: \.element.id) { index, phase in
+                    ForEach(viewModel.phases.indices, id: \.self) { index in
+                        let phase = viewModel.phases[index]
+                        
                         PhaseChipView(
                             phase: phase,
                             isActive: isActive(index),
                             isCompleted: isCompleted(index)
                         )
-                        .id(index)
+                        .id(index) 
                         .onTapGesture {
                             withAnimation(.easeInOut(duration: 0)) {
                                 viewModel.jumpToPhase(at: index)
                             }
                         }
                     }
+                    
                 }
                 .scrollTargetLayout()
                 .padding(.horizontal, 24)
@@ -245,23 +247,20 @@ struct FinishedBannerView: View {
 // MARK: - Timer View
 struct TimerView: View {
     let store: RecipeStore
+    
     @State private var activeRecipe: RecipeItem = RecipeItem.sampleData[0]
     @State private var viewModel = BrewTimerViewModel(phases: BrewPhase.frenchPressSample)
     @State private var showRecipeList = false
     @State private var showEditRecipe = false
     @State private var showAddRecipe  = false
-    @State private var activeRecipeName   = "Classic French Press"
-    @State private var activeCoffeeGrams  = 25
-    @State private var activeWaterMl      = 250
 
     var body: some View {
         NavigationStack {
             ZStack {
                 VStack(spacing: 0) {
-                    Text("\(activeCoffeeGrams)g · \(activeWaterMl)ml")
+                    Text("\(activeRecipe.coffeeGrams)g · \(activeRecipe.waterMl)ml · \(activeRecipe.formattedTotalTime)")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                        .padding(.top, 8)
                         .padding(.bottom, 28)
 
                     CountdownRingView(viewModel: viewModel)
@@ -295,7 +294,8 @@ struct TimerView: View {
                 }
             }
             .animation(.easeInOut(duration: 0.1), value: viewModel.timerState)
-            .navigationTitle(activeRecipeName)
+            
+            .navigationTitle(activeRecipe.name)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -317,18 +317,22 @@ struct TimerView: View {
                 }
             }
             .sheet(isPresented: $showRecipeList) {
-                Category(currentRecipe: activeRecipeName, store: store) { selected in
-                    viewModel         = BrewTimerViewModel(phases: selected.phases)
+                Category(currentRecipe: activeRecipe.name, store: store) { selected in
                     activeRecipe = selected
-                    activeRecipeName  = selected.name
-                    activeCoffeeGrams = selected.coffeeGrams
-                    activeWaterMl     = selected.waterMl
+                    viewModel    = BrewTimerViewModel(phases: selected.phases)
                 }
                 .presentationDragIndicator(.visible)
             }
             .sheet(isPresented: $showEditRecipe) {
                 Recipes(mode: .edit, item: activeRecipe, store: store)
                     .presentationDragIndicator(.visible)
+            }
+            .onChange(of: showEditRecipe) { _, isShowing in
+                guard !isShowing else { return }
+                if let updated = store.recipes.first(where: { $0.id == activeRecipe.id }) {
+                    activeRecipe = updated
+                    viewModel = BrewTimerViewModel(phases: updated.phases)
+                }
             }
             .sheet(isPresented: $showAddRecipe) {
                 Recipes(mode: .add, store: store)

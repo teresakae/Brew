@@ -8,13 +8,32 @@
 import Foundation
 
 struct RecipeItem: Identifiable {
-    let id = UUID()
+    let id: UUID
     let name: String
     let category: String
     let icon: String
     let phases: [BrewPhase]
     let coffeeGrams: Int
     let waterMl: Int
+    
+    var totalBrewTime: TimeInterval {
+        phases.reduce(0) { $0 + $1.duration }
+    }
+    
+    var formattedTotalTime: String {
+        let total = Int(totalBrewTime)
+        return String(format: "%d:%02d", total / 60, total % 60)
+    }
+    
+    init(id: UUID = UUID(), name: String, category: String, icon: String, phases: [BrewPhase], coffeeGrams: Int, waterMl: Int) {
+        self.id = id
+        self.name = name
+        self.category = category
+        self.icon = icon
+        self.phases = phases
+        self.coffeeGrams = coffeeGrams
+        self.waterMl = waterMl
+    }
 }
 
 extension RecipeItem {

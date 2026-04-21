@@ -9,9 +9,7 @@ import Foundation
 import Observation
 import UIKit
 
-// MARK: - Timer State
-
-// J
+// MARK: - Timer State (J)
 enum TimerState: Equatable {
     case idle
     case running
@@ -20,9 +18,7 @@ enum TimerState: Equatable {
     case finished
 }
 
-// MARK: - Haptic Player
-
-// J
+// MARK: - Haptic Player (J)
 enum HapticPlayer {
     static func playPhaseEnd() {
         let generator = UINotificationFeedbackGenerator()
@@ -37,23 +33,19 @@ enum HapticPlayer {
     }
 }
 
-// MARK: - ViewModel
-
-// Apple Documentation
+// MARK: - ViewModel (N)
 @Observable
 final class BrewTimerViewModel {
 
     // MARK: - Observed state
-
     private(set) var timerState: TimerState = .idle
     private(set) var currentPhaseIndex: Int = 0
 
-    // GitHub Pomodoro
+    // G
     private(set) var segmentStartDate: Date = .now
     private(set) var priorElapsed: TimeInterval = 0
 
     // MARK: - Immutable inputs
-
     let phases: [BrewPhase]
 
     // MARK: - Private
@@ -115,7 +107,6 @@ final class BrewTimerViewModel {
     }
 
     // MARK: - Sound Placeholders
-
     func playPhaseSound() {
         guard let soundName = currentPhase.soundName else {
             HapticPlayer.playPhaseEnd()

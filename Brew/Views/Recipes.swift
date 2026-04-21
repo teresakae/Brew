@@ -11,11 +11,11 @@ struct Recipes: View {
     var mode: RecipeMode = .add
     var item: RecipeItem? = nil
     let store: RecipeStore
-
+    
     @Environment(\.dismiss) private var dismiss
     @State private var recipe = RecipeData()
     @State private var showDeleteConfirmation = false
-
+    
     var totalBrewTime: String {
         let totalMinutes = recipe.steps.reduce(0) { $0 + (Int($1.minutes) ?? 0) }
         let totalSeconds = recipe.steps.reduce(0) { $0 + (Int($1.seconds) ?? 0) }
@@ -23,14 +23,13 @@ struct Recipes: View {
         let finalSeconds = totalSeconds % 60
         return String(format: "%d min %02d sec", finalMinutes, finalSeconds)
     }
-
+    
     var body: some View {
         NavigationStack {
             Form {
                 Section("Basics") {
                     TextField("Recipe Name", text: $recipe.title)
                     Picker("Category", selection: $recipe.category) {
-                        Text("V60").tag("V60")
                         Text("French Press").tag("French Press")
                         Text("Aero Press").tag("Aero Press")
                         Text("Moka Pot").tag("Moka Pot")
@@ -55,26 +54,38 @@ struct Recipes: View {
                     TextField("Water TDS", text: $recipe.waterTDS)
                     TextField("Bean Origin", text: $recipe.beanOrigin)
                 }
-
-                ForEach(Array(recipe.steps.enumerated()), id: \.element.id) { index, step in
-                    Section("Step \(index + 1)") {
+                
+                Section("Brewing Steps") {
+                    ForEach($recipe.steps) { $step in
+                        let index = recipe.steps.firstIndex(where: { $0.id == step.id }) ?? 0
+                        
                         VStack(spacing: 0) {
-                            TextField("Step name", text: binding(for: step).recipeName)
+                            HStack {
+                                Text("Step \(index + 1)")
+                                    .font(.headline)
+                                    .foregroundStyle(.secondary)
+                                    .textCase(.uppercase)
+                                    .font(.caption)
+                                Spacer()
+                            }
+                            .padding(.bottom, 8)
+                            
+                            TextField("Step name", text: $step.recipeName)
                                 .padding(.vertical, 11)
                             Divider()
-                            TextField("Instructions", text: binding(for: step).instructions, axis: .vertical)
+                            TextField("Instructions", text: $step.instructions, axis: .vertical)
                                 .lineLimit(3...6)
                                 .padding(.vertical, 11)
                             Divider()
                             HStack {
                                 Text("Time spent")
                                 Spacer()
-                                TextField("0", text: binding(for: step).minutes)
+                                TextField("0", text: $step.minutes)
                                     .keyboardType(.numberPad)
                                     .multilineTextAlignment(.trailing)
                                     .frame(width: 40)
                                 Text("min")
-                                TextField("0", text: binding(for: step).seconds)
+                                TextField("0", text: $step.seconds)
                                     .keyboardType(.numberPad)
                                     .multilineTextAlignment(.trailing)
                                     .frame(width: 40)
@@ -91,9 +102,9 @@ struct Recipes: View {
                             .tint(.red)
                         }
                     }
+                    .onMove(perform: moveStep)
                 }
-                .onMove(perform: moveStep)
-
+                
                 Section {
                     Button { addStep() } label: {
                         HStack {
@@ -102,7 +113,7 @@ struct Recipes: View {
                         }
                     }
                 }
-
+                
                 Section {
                     HStack {
                         Text("Total brew time")
@@ -110,7 +121,7 @@ struct Recipes: View {
                         Text(totalBrewTime).foregroundStyle(.secondary)
                     }
                 }
-
+                
                 if mode == .edit {
                     Section {
                         Button(role: .destructive) {
@@ -168,12 +179,13 @@ struct Recipes: View {
             }
         }
     }
-
+    
     // MARK: - Helpers
-
+    
     private func saveRecipe() {
         let phases = recipe.steps.map { $0.toBrewPhase() }
         let newItem = RecipeItem(
+            id: item?.id ?? UUID(),
             name: recipe.title.isEmpty ? "Untitled Recipe" : recipe.title,
             category: recipe.category,
             icon: "cup.and.saucer.fill",
@@ -181,20 +193,22 @@ struct Recipes: View {
             coffeeGrams: Int(recipe.coffeeDose) ?? 0,
             waterMl: Int(recipe.waterDose) ?? 0
         )
-        store.recipes.append(newItem)
-    }
-
-    private func binding(for step: BrewStep) -> Binding<BrewStep> {
-        guard let index = recipe.steps.firstIndex(where: { $0.id == step.id }) else {
-            fatalError("Step not found")
+        if let existing = item,
+           let index = store.recipes.firstIndex(where: { $0.id == existing.id }) {
+            store.recipes[index] = newItem
+        } else {
+            store.recipes.append(newItem)
         }
-        return $recipe.steps[index]
     }
-
+    
     func addStep() { recipe.steps.append(BrewStep()) }
     func deleteStep(_ step: BrewStep) { recipe.steps.removeAll { $0.id == step.id } }
     func moveStep(from source: IndexSet, to destination: Int) { recipe.steps.move(fromOffsets: source, toOffset: destination) }
-    func deleteRecipe() { print("Recipe deleted") }
+    func deleteRecipe() {
+        guard let item else { return }
+        store.recipes.removeAll { $0.id == item.id }
+        dismiss()
+    }
 }
 
 #Preview {
