@@ -8,21 +8,13 @@
 import SwiftUI
 
 struct Recipes: View {
-    @State private var title = ""
-    @State private var description = ""
-    @State private var notificationsOn = false
-    @State private var category = "V60"
-    @State private var coffeeDose = ""
-    @State private var waterDose = ""
-    @State private var grindSize = "Very fine"
-    @State private var waterTDS = ""
-    @State private var beanOrigin = ""
-    @State private var steps: [BrewStep] = [BrewStep()]
+    var mode: RecipeMode = .edit
+    @State private var recipe = RecipeData()
     @State private var showDeleteConfirmation = false
 
     var totalBrewTime: String {
-        let totalMinutes = steps.reduce(0) { $0 + (Int($1.minutes) ?? 0) }
-        let totalSeconds = steps.reduce(0) { $0 + (Int($1.seconds) ?? 0) }
+        let totalMinutes = recipe.steps.reduce(0) { $0 + (Int($1.minutes) ?? 0) }
+        let totalSeconds = recipe.steps.reduce(0) { $0 + (Int($1.seconds) ?? 0) }
         let finalMinutes = totalMinutes + (totalSeconds / 60)
         let finalSeconds = totalSeconds % 60
         return String(format: "%d min %02d sec", finalMinutes, finalSeconds)
@@ -32,25 +24,26 @@ struct Recipes: View {
         NavigationStack {
             Form {
                 Section("Basics") {
-                    TextField("Recipe Name", text: $title)
-                    Picker("Category", selection: $category) {
+                    TextField("Recipe Name", text: $recipe.title)
+                    Picker("Category", selection: $recipe.category) 
+                    {
                         Text("V60").tag("V60")
                         Text("Personal").tag("Personal")
                     }
                 }
                 Section("Ingredients") {
-                    TextField("Coffee Dose", text: $coffeeDose)
-                    TextField("Water Dose", text: $waterDose)
+                    TextField("Coffee Dose", text: $recipe.coffeeDose)
+                    TextField("Water Dose", text: $recipe.waterDose)
                 }
                 Section("Details (optional)") {
-                    Picker("Grind Size", selection: $grindSize) {
+                    Picker("Grind Size", selection: $recipe.grindSize) {
                         Text("Very fine").tag("Very fine")
                     }
-                    TextField("Water TDS", text: $waterTDS)
-                    TextField("Bean Origin", text: $beanOrigin)
+                    TextField("Water TDS", text: $recipe.waterTDS)
+                    TextField("Bean Origin", text: $recipe.beanOrigin)
                 }
 
-                ForEach(Array(steps.enumerated()), id: \.element.id) { index, step in
+                ForEach(Array(recipe.steps.enumerated()), id: \.element.id) { index, step in
                     Section("Step \(index + 1)") {
                         VStack(spacing: 0) {
                             TextField("Step name", text: binding(for: step).recipeName)
@@ -116,7 +109,7 @@ struct Recipes: View {
                     }
                 }
             }
-            .navigationTitle("Edit Recipe")
+            .navigationTitle(mode == .add ? "Add Recipe" : "Edit Recipe")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -141,15 +134,15 @@ struct Recipes: View {
     }
 
     private func binding(for step: BrewStep) -> Binding<BrewStep> {
-        guard let index = steps.firstIndex(where: { $0.id == step.id }) else {
+        guard let index = recipe.steps.firstIndex(where: { $0.id == step.id }) else {
             fatalError("Step not found")
         }
-        return $steps[index]
+        return $recipe.steps[index]
     }
 
-    func addStep()  { steps.append(BrewStep()) }
-    func deleteStep(_ step: BrewStep) { steps.removeAll { $0.id == step.id } }
-    func moveStep(from source: IndexSet, to destination: Int) { steps.move(fromOffsets: source, toOffset: destination) }
+    func addStep() { recipe.steps.append(BrewStep()) }
+    func deleteStep(_ step: BrewStep) { recipe.steps.removeAll { $0.id == step.id } }
+    func moveStep(from source: IndexSet, to destination: Int) { recipe.steps.move(fromOffsets: source, toOffset: destination) }
     func deleteRecipe() { print("Recipe deleted") }
 }
 

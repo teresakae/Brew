@@ -349,11 +349,11 @@
                     .presentationDragIndicator(.visible)
                 }
                 .sheet(isPresented: $showEditRecipe) {
-                    Recipes()
+                    Recipes(mode: .edit)
                         .presentationDragIndicator(.visible)
                 }
                 .sheet(isPresented: $showAddRecipe) {
-                    Recipes()
+                    Recipes(mode: .add)
                         .presentationDragIndicator(.visible)
                 }
             }
