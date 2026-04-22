@@ -30,7 +30,7 @@ struct BrewPhase: Identifiable {
         self.soundName       = soundName
     }
 
-    // Native Component
+    // N
     var formattedDuration: String {
         let m = Int(duration) / 60
         let s = Int(duration) % 60

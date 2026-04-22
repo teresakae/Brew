@@ -19,6 +19,7 @@ enum TimerState: Equatable {
 }
 
 // MARK: - Haptic Player (J)
+// does tgus do anyth
 enum HapticPlayer {
     static func playPhaseEnd() {
         let generator = UINotificationFeedbackGenerator()
@@ -106,7 +107,7 @@ final class BrewTimerViewModel {
         }
     }
 
-    // MARK: - Sound Placeholders
+    // MARK: - Sound laterrrrrrrrrr
     func playPhaseSound() {
         guard let soundName = currentPhase.soundName else {
             HapticPlayer.playPhaseEnd()

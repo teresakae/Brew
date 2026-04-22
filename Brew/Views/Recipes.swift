@@ -30,11 +30,9 @@ struct Recipes: View {
                 Section("Basics") {
                     TextField("Recipe Name", text: $recipe.title)
                     Picker("Category", selection: $recipe.category) {
-                        Text("French Press").tag("French Press")
-                        Text("Aero Press").tag("Aero Press")
-                        Text("Moka Pot").tag("Moka Pot")
-                        Text("Espresso").tag("Espresso")
-                        Text("Others").tag("Others")
+                                            ForEach(BrewCategory.allCases, id: \.self) { category in
+                                                Text(category.rawValue).tag(category)
+                                            }
                     }
                 }
                 Section("Ingredients") {
@@ -43,6 +41,8 @@ struct Recipes: View {
                     TextField("Water Dose (ml)", text: $recipe.waterDose)
                         .keyboardType(.numberPad)
                 }
+                
+                // ! this can be an enum but uhhhhh later yur
                 Section("Details (optional)") {
                     Picker("Grind Size", selection: $recipe.grindSize) {
                         Text("Very fine").tag("Very fine")
@@ -180,15 +180,12 @@ struct Recipes: View {
         }
     }
     
-    // MARK: - Helpers
-    
     private func saveRecipe() {
         let phases = recipe.steps.map { $0.toBrewPhase() }
         let newItem = RecipeItem(
             id: item?.id ?? UUID(),
             name: recipe.title.isEmpty ? "Untitled Recipe" : recipe.title,
             category: recipe.category,
-            icon: "cup.and.saucer.fill",
             phases: phases,
             coffeeGrams: Int(recipe.coffeeDose) ?? 0,
             waterMl: Int(recipe.waterDose) ?? 0

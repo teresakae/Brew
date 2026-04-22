@@ -1,24 +1,16 @@
-//
-//  Category.swift
-//  Brew
-//
-//  Created by Teresa Kae on 20/04/26.
-//
-
 import SwiftUI
 
 struct Category: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var selected = "All"
+    
+    @State private var selectedCategory: BrewCategory? = nil
     let currentRecipe: String
-
     let store: RecipeStore
     var onSelect: (RecipeItem) -> Void
-
-    let filterCategories = ["All", "Pour Over", "French Press", "Aero Press", "Moka Pot", "Espresso", "Others"]
-
+    
     var filteredRecipes: [RecipeItem] {
-        selected == "All" ? store.recipes : store.recipes.filter { $0.category == selected }
+        guard let selected = selectedCategory else { return store.recipes }
+        return store.recipes.filter { $0.category == selected }
     }
 
     let accent = Color(red: 0.765, green: 0.839, blue: 0.427)
@@ -28,23 +20,13 @@ struct Category: View {
             VStack(spacing: 0) {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
-                        ForEach(filterCategories, id: \.self) { category in
-                            Text(category)
-                                .font(.subheadline)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 8)
-                                .background(
-                                    Capsule().fill(
-                                        selected == category
-                                            ? AnyShapeStyle(accent.opacity(0.65))
-                                            : AnyShapeStyle(.ultraThinMaterial)
-                                    )
-                                )
-                                .onTapGesture {
-                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                        selected = category
-                                    }
-                                }
+                        filterChip(title: "All", isSelected: selectedCategory == nil) {
+                            selectedCategory = nil
+                        }
+                        ForEach(BrewCategory.allCases, id: \.self) { category in
+                            filterChip(title: category.rawValue, isSelected: selectedCategory == category) {
+                                selectedCategory = category
+                            }
                         }
                     }
                     .padding(.horizontal)
@@ -53,17 +35,26 @@ struct Category: View {
 
                 List(filteredRecipes) { recipe in
                     HStack(spacing: 14) {
-                        Image(systemName: recipe.icon)
-                            .font(.title2)
-                            .foregroundStyle(accent)
-                            .frame(width: 36)
-
-                        VStack(alignment: .leading, spacing: 2) {
+                        
+                        if recipe.category == .others {
+                            Image(systemName: recipe.category.iconName)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 32, height: 32)
+                                .foregroundStyle(accent)
+                        } else {
+                            Image(recipe.category.iconName)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 32, height: 32)
+                        }
+                        
+                    VStack(alignment: .leading, spacing: 2) {
                             Text(recipe.name)
                                 .font(.body)
                                 .fontWeight(.semibold)
                                 .foregroundStyle(recipe.name == currentRecipe ? accent : .primary)
-                            Text(recipe.category)
+                            Text(recipe.category.rawValue)
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                         }
@@ -96,4 +87,32 @@ struct Category: View {
             }
         }
     }
+
+    @ViewBuilder
+    private func filterChip(title: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Text(title)
+            .font(.subheadline)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(
+                Capsule().fill(
+                    isSelected
+                    ? AnyShapeStyle(accent.opacity(0.65))
+                    : AnyShapeStyle(.ultraThinMaterial)
+                )
+            )
+            .onTapGesture {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                    action()
+                }
+            }
+    }
+}
+
+#Preview {
+    Category(
+        currentRecipe: "Classic French Press",
+        store: RecipeStore(),
+        onSelect: { _ in }
+    )
 }

@@ -10,8 +10,7 @@ import Foundation
 struct RecipeItem: Identifiable {
     let id: UUID
     let name: String
-    let category: String
-    let icon: String
+    let category: BrewCategory
     let phases: [BrewPhase]
     let coffeeGrams: Int
     let waterMl: Int
@@ -25,11 +24,10 @@ struct RecipeItem: Identifiable {
         return String(format: "%d:%02d", total / 60, total % 60)
     }
     
-    init(id: UUID = UUID(), name: String, category: String, icon: String, phases: [BrewPhase], coffeeGrams: Int, waterMl: Int) {
+    init(id: UUID = UUID(), name: String, category: BrewCategory, phases: [BrewPhase], coffeeGrams: Int, waterMl: Int) {
         self.id = id
         self.name = name
         self.category = category
-        self.icon = icon
         self.phases = phases
         self.coffeeGrams = coffeeGrams
         self.waterMl = waterMl
@@ -38,8 +36,28 @@ struct RecipeItem: Identifiable {
 
 extension RecipeItem {
     static let sampleData: [RecipeItem] = [
-        RecipeItem(name: "Classic French Press", category: "French Press", icon: "cup.and.saucer.fill", phases: BrewPhase.frenchPressSample, coffeeGrams: 25, waterMl: 250),
-        RecipeItem(name: "V60", category: "Pour Over", icon: "cup.and.saucer.fill", phases: BrewPhase.v60Sample, coffeeGrams: 15, waterMl: 250),
-        RecipeItem(name: "Classic Aero Press", category: "Aero Press", icon: "cup.and.saucer.fill", phases: BrewPhase.aeropressSample, coffeeGrams: 18, waterMl: 200)
+        RecipeItem(name: "Classic French Press", category: .frenchPress, phases: BrewPhase.frenchPressSample, coffeeGrams: 25, waterMl: 250),
+        RecipeItem(name: "V60", category: .pourOver, phases: BrewPhase.v60Sample, coffeeGrams: 15, waterMl: 250),
+        RecipeItem(name: "Classic Aero Press", category: .aeroPress, phases: BrewPhase.aeropressSample, coffeeGrams: 18, waterMl: 200)
     ]
+}
+
+enum BrewCategory: String, CaseIterable, Codable {
+    case pourOver = "Pour Over"
+    case frenchPress = "French Press"
+    case aeroPress = "Aero Press"
+    case mokaPot = "Moka Pot"
+    case espresso = "Espresso"
+    case others = "Others"
+    
+    var iconName: String {
+        switch self {
+        case .pourOver:    return "pour over"
+        case .frenchPress: return "french press"
+        case .aeroPress:   return "aeropress"
+        case .mokaPot:     return "moka pot"
+        case .espresso:    return "espresso"
+        case .others:      return "cup.and.saucer.fill" 
+        }
+    }
 }

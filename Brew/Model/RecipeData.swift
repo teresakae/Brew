@@ -15,7 +15,7 @@ struct RecipeData {
     var title: String = ""
     var description: String = ""
     var notificationsOn: Bool = false
-    var category: String = ""
+    var category: BrewCategory = .frenchPress
     var coffeeDose: String = ""
     var waterDose: String = ""
     var grindSize: String = "Very fine"

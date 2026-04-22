@@ -17,7 +17,7 @@ struct CountdownRingView: View {
             let metrics = calculateMetrics(at: context.date)
 
             ZStack {
-                // Ring Glow
+                // glowww
                 Circle()
                     .fill(
                         RadialGradient(
@@ -28,11 +28,11 @@ struct CountdownRingView: View {
                         )
                     )
 
-                // Background track
+                // grayss
                 Circle()
                     .stroke(Color(.systemGray5), lineWidth: 10)
 
-                // Progress arc
+                // progress
                 Circle()
                     .trim(from: 0, to: metrics.progress)
                     .stroke(Color.accentColor,
