@@ -55,13 +55,25 @@ struct Recipes: View {
                     TextField("Bean Origin", text: $recipe.beanOrigin)
                 }
                 
+                Section("Brew Steps") {
                     ForEach($recipe.steps) { $step in
                         let index = recipe.steps.firstIndex(where: { $0.id == step.id }) ?? 0
                         
 //                        Section("Step \(index + 1)") {
                             VStack(spacing: 0) {
-                                TextField("Step name", text: $step.recipeName)
-                                    .padding(.vertical, 11)
+                                HStack {
+                                    ZStack {
+                                        Circle()
+                                            .fill(Color.accentColor)
+                                            .frame(width: 22, height: 22)
+                                        Text("\(index + 1)")
+                                            .font(.caption)
+                                            .fontWeight(.bold)
+                                            .foregroundStyle(.black)
+                                    }
+                                    TextField("Step name", text: $step.recipeName)
+                                }
+                                .padding(.vertical, 11)
                                 Divider()
                                 TextField("Instructions", text: $step.instructions, axis: .vertical)
                                     .lineLimit(3...6)
@@ -94,7 +106,8 @@ struct Recipes: View {
 //                        }
                     }
                     .onMove(perform: moveStep) // doesnt work yet lmaoaoao
-                
+                }
+
                 Section {
                     Button { addStep() } label: {
                         HStack {
