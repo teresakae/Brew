@@ -88,7 +88,6 @@ struct Category: View {
         }
     }
 
-    @ViewBuilder
     private func filterChip(title: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
         Text(title)
             .font(.subheadline)
