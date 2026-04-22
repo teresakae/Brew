@@ -30,9 +30,9 @@ struct Recipes: View {
                 Section("Basics") {
                     TextField("Recipe Name", text: $recipe.title)
                     Picker("Category", selection: $recipe.category) {
-                                            ForEach(BrewCategory.allCases, id: \.self) { category in
-                                                Text(category.rawValue).tag(category)
-                                            }
+                        ForEach(BrewCategory.allCases, id: \.self) { category in
+                            Text(category.rawValue).tag(category)
+                        }
                     }
                 }
                 Section("Ingredients") {
@@ -55,55 +55,45 @@ struct Recipes: View {
                     TextField("Bean Origin", text: $recipe.beanOrigin)
                 }
                 
-                Section("Brewing Steps") {
                     ForEach($recipe.steps) { $step in
                         let index = recipe.steps.firstIndex(where: { $0.id == step.id }) ?? 0
                         
-                        VStack(spacing: 0) {
-                            HStack {
-                                Text("Step \(index + 1)")
-                                    .font(.headline)
-                                    .foregroundStyle(.secondary)
-                                    .textCase(.uppercase)
-                                    .font(.caption)
-                                Spacer()
-                            }
-                            .padding(.bottom, 8)
-                            
-                            TextField("Step name", text: $step.recipeName)
+//                        Section("Step \(index + 1)") {
+                            VStack(spacing: 0) {
+                                TextField("Step name", text: $step.recipeName)
+                                    .padding(.vertical, 11)
+                                Divider()
+                                TextField("Instructions", text: $step.instructions, axis: .vertical)
+                                    .lineLimit(3...6)
                                 .padding(.vertical, 11)
-                            Divider()
-                            TextField("Instructions", text: $step.instructions, axis: .vertical)
-                                .lineLimit(3...6)
+                                Divider()
+                                HStack {
+                                    Text("Time spent")
+                                    Spacer()
+                                    TextField("0", text: $step.minutes)
+                                        .keyboardType(.numberPad)
+                                        .multilineTextAlignment(.trailing)
+                                        .frame(width: 40)
+                                    Text("min")
+                                    TextField("0", text: $step.seconds)
+                                        .keyboardType(.numberPad)
+                                        .multilineTextAlignment(.trailing)
+                                        .frame(width: 40)
+                                    Text("sec")
+                                }
                                 .padding(.vertical, 11)
-                            Divider()
-                            HStack {
-                                Text("Time spent")
-                                Spacer()
-                                TextField("0", text: $step.minutes)
-                                    .keyboardType(.numberPad)
-                                    .multilineTextAlignment(.trailing)
-                                    .frame(width: 40)
-                                Text("min")
-                                TextField("0", text: $step.seconds)
-                                    .keyboardType(.numberPad)
-                                    .multilineTextAlignment(.trailing)
-                                    .frame(width: 40)
-                                Text("sec")
                             }
-                            .padding(.vertical, 11)
-                        }
-                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                            Button(role: .destructive) {
-                                deleteStep(step)
-                            } label: {
-                                Label("Delete", systemImage: "trash")
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                Button(role: .destructive) {
+                                    deleteStep(step)
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                                .tint(.red)
                             }
-                            .tint(.red)
-                        }
+//                        }
                     }
-                    .onMove(perform: moveStep)
-                }
+                    .onMove(perform: moveStep) // doesnt work yet lmaoaoao
                 
                 Section {
                     Button { addStep() } label: {
@@ -179,7 +169,7 @@ struct Recipes: View {
             }
         }
     }
-    
+
     private func saveRecipe() {
         let phases = recipe.steps.map { $0.toBrewPhase() }
         let newItem = RecipeItem(
@@ -200,7 +190,10 @@ struct Recipes: View {
     
     func addStep() { recipe.steps.append(BrewStep()) }
     func deleteStep(_ step: BrewStep) { recipe.steps.removeAll { $0.id == step.id } }
-    func moveStep(from source: IndexSet, to destination: Int) { recipe.steps.move(fromOffsets: source, toOffset: destination) }
+    func moveStep(from source: IndexSet, to destination: Int) {
+        recipe.steps.move(fromOffsets: source, toOffset: destination)
+        print(recipe.steps)
+    }
     func deleteRecipe() {
         guard let item else { return }
         store.recipes.removeAll { $0.id == item.id }
