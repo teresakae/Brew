@@ -6,16 +6,18 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct Recipes: View {
     var mode: RecipeMode = .add
     var item: RecipeItem? = nil
-    let store: RecipeStore
-    
+
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var context
+
     @State private var recipe = RecipeData()
     @State private var showDeleteConfirmation = false
-    
+
     var totalBrewTime: String {
         let totalMinutes = recipe.steps.reduce(0) { $0 + (Int($1.minutes) ?? 0) }
         let totalSeconds = recipe.steps.reduce(0) { $0 + (Int($1.seconds) ?? 0) }
@@ -23,7 +25,7 @@ struct Recipes: View {
         let finalSeconds = totalSeconds % 60
         return String(format: "%d min %02d sec", finalMinutes, finalSeconds)
     }
-    
+
     var body: some View {
         NavigationStack {
             Form {
@@ -35,14 +37,14 @@ struct Recipes: View {
                         }
                     }
                 }
+
                 Section("Ingredients") {
                     TextField("Coffee Dose (g)", text: $recipe.coffeeDose)
                         .keyboardType(.numberPad)
                     TextField("Water Dose (ml)", text: $recipe.waterDose)
                         .keyboardType(.numberPad)
                 }
-                
-                // ! this can be an enum but uhhhhh later yur
+
                 Section("Details (optional)") {
                     Picker("Grind Size", selection: $recipe.grindSize) {
                         Text("Very fine").tag("Very fine")
@@ -54,58 +56,56 @@ struct Recipes: View {
                     TextField("Water TDS", text: $recipe.waterTDS)
                     TextField("Bean Origin", text: $recipe.beanOrigin)
                 }
-                
+
                 Section("Brew Steps") {
                     ForEach($recipe.steps) { $step in
                         let index = recipe.steps.firstIndex(where: { $0.id == step.id }) ?? 0
-                        
-//                        Section("Step \(index + 1)") {
-                            VStack(spacing: 0) {
-                                HStack {
-                                    ZStack {
-                                        Circle()
-                                            .fill(Color.accentColor)
-                                            .frame(width: 22, height: 22)
-                                        Text("\(index + 1)")
-                                            .font(.caption)
-                                            .fontWeight(.bold)
-                                            .foregroundStyle(.black)
-                                    }
-                                    TextField("Step name", text: $step.recipeName)
+
+                        VStack(spacing: 0) {
+                            HStack {
+                                ZStack {
+                                    Circle()
+                                        .fill(Color.accentColor)
+                                        .frame(width: 22, height: 22)
+                                    Text("\(index + 1)")
+                                        .font(.caption)
+                                        .fontWeight(.bold)
+                                        .foregroundStyle(.black)
                                 }
-                                .padding(.vertical, 11)
-                                Divider()
-                                TextField("Instructions", text: $step.instructions, axis: .vertical)
-                                    .lineLimit(3...6)
-                                .padding(.vertical, 11)
-                                Divider()
-                                HStack {
-                                    Text("Time spent")
-                                    Spacer()
-                                    TextField("0", text: $step.minutes)
-                                        .keyboardType(.numberPad)
-                                        .multilineTextAlignment(.trailing)
-                                        .frame(width: 40)
-                                    Text("min")
-                                    TextField("0", text: $step.seconds)
-                                        .keyboardType(.numberPad)
-                                        .multilineTextAlignment(.trailing)
-                                        .frame(width: 40)
-                                    Text("sec")
-                                }
-                                .padding(.vertical, 11)
+                                TextField("Step name", text: $step.recipeName)
                             }
-                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                Button(role: .destructive) {
-                                    deleteStep(step)
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
-                                .tint(.red)
+                            .padding(.vertical, 11)
+                            Divider()
+                            TextField("Instructions", text: $step.instructions, axis: .vertical)
+                                .lineLimit(3...6)
+                                .padding(.vertical, 11)
+                            Divider()
+                            HStack {
+                                Text("Time spent")
+                                Spacer()
+                                TextField("0", text: $step.minutes)
+                                    .keyboardType(.numberPad)
+                                    .multilineTextAlignment(.trailing)
+                                    .frame(width: 40)
+                                Text("min")
+                                TextField("0", text: $step.seconds)
+                                    .keyboardType(.numberPad)
+                                    .multilineTextAlignment(.trailing)
+                                    .frame(width: 40)
+                                Text("sec")
                             }
-//                        }
+                            .padding(.vertical, 11)
+                        }
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                deleteStep(step)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                            .tint(.red)
+                        }
                     }
-                    .onMove(perform: moveStep) // doesnt work yet lmaoaoao
+                    .onMove(perform: moveStep)
                 }
 
                 Section {
@@ -116,7 +116,7 @@ struct Recipes: View {
                         }
                     }
                 }
-                
+
                 Section {
                     HStack {
                         Text("Total brew time")
@@ -124,7 +124,7 @@ struct Recipes: View {
                         Text(totalBrewTime).foregroundStyle(.secondary)
                     }
                 }
-                
+
                 if mode == .edit {
                     Section {
                         Button(role: .destructive) {
@@ -143,9 +143,7 @@ struct Recipes: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        dismiss()
-                    } label: {
+                    Button { dismiss() } label: {
                         Image(systemName: "xmark")
                     }
                 }
@@ -165,14 +163,16 @@ struct Recipes: View {
                 recipe.category = item.category
                 recipe.coffeeDose = String(item.coffeeGrams)
                 recipe.waterDose = String(item.waterMl)
-                recipe.steps = item.phases.map { phase in
-                    var step = BrewStep()
-                    step.recipeName = phase.name
-                    step.instructions = phase.instruction
-                    step.minutes = String(Int(phase.duration) / 60)
-                    step.seconds = String(Int(phase.duration) % 60)
-                    return step
-                }
+                recipe.steps = item.phases
+                    .sorted { $0.sortOrder < $1.sortOrder }
+                    .map { phase in
+                        var step = BrewStep()
+                        step.recipeName = phase.name
+                        step.instructions = phase.instruction
+                        step.minutes = String(Int(phase.duration) / 60)
+                        step.seconds = String(Int(phase.duration) % 60)
+                        return step
+                    }
             }
             .alert("Delete Recipe?", isPresented: $showDeleteConfirmation) {
                 Button("Cancel", role: .cancel) { }
@@ -183,37 +183,49 @@ struct Recipes: View {
         }
     }
 
+    // MARK: - Actions
     private func saveRecipe() {
-        let phases = recipe.steps.map { $0.toBrewPhase() }
-        let newItem = RecipeItem(
-            id: item?.id ?? UUID(),
-            name: recipe.title.isEmpty ? "Untitled Recipe" : recipe.title,
-            category: recipe.category,
-            phases: phases,
-            coffeeGrams: Int(recipe.coffeeDose) ?? 0,
-            waterMl: Int(recipe.waterDose) ?? 0
-        )
-        if let existing = item,
-           let index = store.recipes.firstIndex(where: { $0.id == existing.id }) {
-            store.recipes[index] = newItem
+        let phases = recipe.steps.enumerated().map { index, step in
+            BrewPhase(
+                name: step.recipeName,
+                duration: TimeInterval((Int(step.minutes) ?? 0) * 60 + (Int(step.seconds) ?? 0)),
+                instruction: step.instructions,
+                sortOrder: index
+            )
+        }
+
+        if let existing = item {
+            existing.name = recipe.title.isEmpty ? "Untitled Recipe" : recipe.title
+            existing.category = recipe.category
+            existing.coffeeGrams = Int(recipe.coffeeDose) ?? 0
+            existing.waterMl = Int(recipe.waterDose) ?? 0
+            existing.phases.forEach { context.delete($0) }
+            existing.phases = phases
         } else {
-            store.recipes.append(newItem)
+            let newItem = RecipeItem(
+                name: recipe.title.isEmpty ? "Untitled Recipe" : recipe.title,
+                category: recipe.category,
+                phases: phases,
+                coffeeGrams: Int(recipe.coffeeDose) ?? 0,
+                waterMl: Int(recipe.waterDose) ?? 0
+            )
+            context.insert(newItem)
         }
     }
-    
+
     func addStep() { recipe.steps.append(BrewStep()) }
     func deleteStep(_ step: BrewStep) { recipe.steps.removeAll { $0.id == step.id } }
     func moveStep(from source: IndexSet, to destination: Int) {
         recipe.steps.move(fromOffsets: source, toOffset: destination)
-        print(recipe.steps)
     }
     func deleteRecipe() {
         guard let item else { return }
-        store.recipes.removeAll { $0.id == item.id }
+        context.delete(item)
         dismiss()
     }
 }
 
 #Preview {
-    Recipes(mode: .add, store: RecipeStore())
+    Recipes(mode: .add)
+        .modelContainer(for: RecipeItem.self, inMemory: true)
 }

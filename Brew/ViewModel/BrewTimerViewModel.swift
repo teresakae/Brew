@@ -19,7 +19,6 @@ enum TimerState: Equatable {
 }
 
 // MARK: - Haptic Player (J)
-// does tgus do anyth
 enum HapticPlayer {
     static func playPhaseEnd() {
         let generator = UINotificationFeedbackGenerator()
@@ -53,7 +52,10 @@ final class BrewTimerViewModel {
     private var timerTask: Task<Void, Never>?
 
     // MARK: - Convenience
-    var currentPhase: BrewPhase { phases[currentPhaseIndex] }
+    var currentPhase: BrewPhase {
+        guard !phases.isEmpty else { return BrewPhase(name: "", duration: 0, instruction: "")}
+        return phases[currentPhaseIndex]
+    }
     var isLastPhase: Bool       { currentPhaseIndex == phases.count - 1 }
 
     // MARK: - Init

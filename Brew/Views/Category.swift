@@ -1,16 +1,22 @@
+//
+//  Category.swift
+//  Brew
+//
+
 import SwiftUI
+import SwiftData
 
 struct Category: View {
     @Environment(\.dismiss) private var dismiss
-    
+    @Query(sort: \RecipeItem.name) var recipes: [RecipeItem]
+
     @State private var selectedCategory: BrewCategory? = nil
-    let currentRecipe: String
-    let store: RecipeStore
+    let currentRecipeName: String
     var onSelect: (RecipeItem) -> Void
-    
+
     var filteredRecipes: [RecipeItem] {
-        guard let selected = selectedCategory else { return store.recipes }
-        return store.recipes.filter { $0.category == selected }
+        guard let selected = selectedCategory else { return recipes }
+        return recipes.filter { $0.category == selected }
     }
 
     let accent = Color(red: 0.765, green: 0.839, blue: 0.427)
@@ -35,7 +41,6 @@ struct Category: View {
 
                 List(filteredRecipes) { recipe in
                     HStack(spacing: 14) {
-                        
                         if recipe.category == .others {
                             Image(systemName: recipe.category.iconName)
                                 .resizable()
@@ -48,12 +53,12 @@ struct Category: View {
                                 .scaledToFit()
                                 .frame(width: 32, height: 32)
                         }
-                        
-                    VStack(alignment: .leading, spacing: 2) {
+
+                        VStack(alignment: .leading, spacing: 2) {
                             Text(recipe.name)
                                 .font(.body)
                                 .fontWeight(.semibold)
-                                .foregroundStyle(recipe.name == currentRecipe ? accent : .primary)
+                                .foregroundStyle(recipe.name == currentRecipeName ? accent : .primary)
                             Text(recipe.category.rawValue)
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
@@ -61,7 +66,7 @@ struct Category: View {
 
                         Spacer()
 
-                        if recipe.name == currentRecipe {
+                        if recipe.name == currentRecipeName {
                             Circle()
                                 .fill(accent)
                                 .frame(width: 8, height: 8)
@@ -109,9 +114,6 @@ struct Category: View {
 }
 
 #Preview {
-    Category(
-        currentRecipe: "Classic French Press",
-        store: RecipeStore(),
-        onSelect: { _ in }
-    )
+    Category(currentRecipeName: "Classic French Press", onSelect: { _ in })
+        .modelContainer(for: RecipeItem.self, inMemory: true)
 }

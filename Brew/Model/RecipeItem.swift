@@ -6,24 +6,24 @@
 //
 
 import Foundation
+import SwiftData
 
-struct RecipeItem: Identifiable {
-    let id: UUID
-    let name: String
-    let category: BrewCategory
-    let phases: [BrewPhase]
-    let coffeeGrams: Int
-    let waterMl: Int
+@Model
+class RecipeItem: Identifiable {
+    var id: UUID
+    var name: String
+    var category: BrewCategory
+    @Relationship(deleteRule: .cascade) var phases: [BrewPhase]
+    var coffeeGrams: Int
+    var waterMl: Int
     
     var totalBrewTime: TimeInterval {
         phases.reduce(0) { $0 + $1.duration }
     }
-    
     var formattedTotalTime: String {
         let total = Int(totalBrewTime)
         return String(format: "%d:%02d", total / 60, total % 60)
     }
-    
     init(id: UUID = UUID(), name: String, category: BrewCategory, phases: [BrewPhase], coffeeGrams: Int, waterMl: Int) {
         self.id = id
         self.name = name

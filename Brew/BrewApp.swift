@@ -6,14 +6,14 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct BrewApp: App {
-    @State private var store = RecipeStore()
-
     var body: some Scene {
         WindowGroup {
-            TimerView(store: store)
+            TimerView()
         }
+        .modelContainer(for: RecipeItem.self)
     }
 }
