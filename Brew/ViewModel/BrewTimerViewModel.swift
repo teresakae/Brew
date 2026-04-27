@@ -92,7 +92,7 @@ final class BrewTimerViewModel {
             timerState = .paused
         }
     }
-
+    //buat code soundnya
     func playPhaseSignal(isCompletion: Bool = false) {
         audioPlayer?.stop()
         audioPlayer = nil
@@ -103,7 +103,7 @@ final class BrewTimerViewModel {
         generator.notificationOccurred(isCompletion ? .warning : .success)
         
         //sound
-        let audioFileName = isCompletion ? "surprise" : "Handoff"
+        let audioFileName = isCompletion ? "Final" : "Handoff"
             
             guard let soundName = NSDataAsset(name: audioFileName) else {
                 print ("No sound found for \(audioFileName)")
