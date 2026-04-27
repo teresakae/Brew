@@ -12,8 +12,8 @@ struct Recipes: View {
     var mode: RecipeMode = .add
     var item: RecipeItem? = nil
 
-    @Environment(\.dismiss) private var dismiss
-    @Environment(\.modelContext) private var context
+    @Environment(\.dismiss) private var dismiss // for the sheet
+    @Environment(\.modelContext) private var context // to look into the database
 
     @State private var recipe = RecipeData()
     @State private var showDeleteConfirmation = false
@@ -183,7 +183,6 @@ struct Recipes: View {
         }
     }
 
-    // MARK: - Actions
     private func saveRecipe() {
         let phases = recipe.steps.enumerated().map { index, step in
             BrewPhase(

@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		13007BA32F93D6A300DEF3F2 /* Brew.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Brew.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13007BA32F93D6A300DEF3F2 /* Brew.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Brew.app; path = "/Users/kaes/Documents/ADA/Brew/build/Debug-iphoneos/Brew.app"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -33,16 +33,7 @@
 			isa = PBXGroup;
 			children = (
 				13007BA52F93D6A300DEF3F2 /* Brew */,
-				13007BA42F93D6A300DEF3F2 /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		13007BA42F93D6A300DEF3F2 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				13007BA32F93D6A300DEF3F2 /* Brew.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -95,7 +86,7 @@
 			mainGroup = 13007B9A2F93D6A300DEF3F2;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 13007BA42F93D6A300DEF3F2 /* Products */;
+			productRefGroup = 13007B9A2F93D6A300DEF3F2;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (

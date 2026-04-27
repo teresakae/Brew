@@ -24,7 +24,6 @@ class BrewPhase: Identifiable {
         duration: TimeInterval,
         instruction: String,
         ingredientAmount: Double? = nil,
-        soundName: String? = nil,
         sortOrder: Int = 0
     ) {
         self.id              = id
@@ -32,7 +31,6 @@ class BrewPhase: Identifiable {
         self.duration        = duration
         self.instruction     = instruction
         self.ingredientAmount = ingredientAmount
-        self.soundName       = soundName
         self.sortOrder = sortOrder
     }
 

@@ -14,6 +14,6 @@ struct BrewApp: App {
         WindowGroup {
             TimerView()
         }
-        .modelContainer(for: RecipeItem.self)
+        .modelContainer(for: RecipeItem.self) // sets up the database
     }
 }

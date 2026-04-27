@@ -8,8 +8,9 @@
 import Foundation
 import Observation
 import UIKit
+import AVFoundation
 
-// MARK: - Timer State (J)
+// Timer state (J)
 enum TimerState: Equatable {
     case idle
     case running
@@ -18,52 +19,33 @@ enum TimerState: Equatable {
     case finished
 }
 
-// MARK: - Haptic Player (J)
-enum HapticPlayer {
-    static func playPhaseEnd() {
-        let generator = UINotificationFeedbackGenerator()
-        generator.prepare()
-        generator.notificationOccurred(.success)
-    }
-
-    static func playCompletion() {
-        let generator = UINotificationFeedbackGenerator()
-        generator.prepare()
-        generator.notificationOccurred(.warning)
-    }
-}
-
-// MARK: - ViewModel (N)
 @Observable
 final class BrewTimerViewModel {
-
-    // MARK: - Observed state
+    
+    private var audioPlayer: AVAudioPlayer?
+    
+    // Current state and phase
     private(set) var timerState: TimerState = .idle
     private(set) var currentPhaseIndex: Int = 0
 
-    // G
+    // Starting point and check if previously paused or not
     private(set) var segmentStartDate: Date = .now
     private(set) var priorElapsed: TimeInterval = 0
 
-    // MARK: - Immutable inputs
+    // Phase initiation
     let phases: [BrewPhase]
-
-    // MARK: - Private
     private var timerTask: Task<Void, Never>?
-
-    // MARK: - Convenience
     var currentPhase: BrewPhase {
         guard !phases.isEmpty else { return BrewPhase(name: "", duration: 0, instruction: "")}
         return phases[currentPhaseIndex]
     }
     var isLastPhase: Bool       { currentPhaseIndex == phases.count - 1 }
 
-    // MARK: - Init
     init(phases: [BrewPhase]) {
         self.phases = phases
     }
 
-    // MARK: - Public Controls
+    // Functions
     func start() {
         guard timerState == .idle || timerState == .paused else { return }
         segmentStartDate = .now
@@ -103,28 +85,35 @@ final class BrewTimerViewModel {
         if timerState == .running {
             segmentStartDate = .now
             schedulePhaseEnd()
-            playPhaseSound()
+            playPhaseSignal()
         } else {
             timerState = .paused
         }
     }
 
-    // MARK: - Sound laterrrrrrrrrr
-    func playPhaseSound() {
-        guard let soundName = currentPhase.soundName else {
-            HapticPlayer.playPhaseEnd()
-            return
-        }
+    func playPhaseSignal(isCompletion: Bool = false) {
+        // haptic
+        let generator = UINotificationFeedbackGenerator()
+        generator.prepare()
+        generator.notificationOccurred(isCompletion ? .warning : .success)
         
-        _ = soundName
-        HapticPlayer.playPhaseEnd()
-    }
+        //sound
+        let audioFileName = isCompletion ? "surprise" : "Handoff"
+            
+            guard let soundName = NSDataAsset(name: audioFileName) else {
+                print ("No sound found for \(audioFileName)")
+                return
+            }
 
-    func playCompletionSound() {
-        HapticPlayer.playCompletion()
-    }
-
-    // MARK: - Internal Scheduling
+            do {
+                audioPlayer = try AVAudioPlayer(data: soundName.data)
+                audioPlayer?.play()
+            } catch {
+                print("Audio error: \(error)")
+            }
+        }
+    
+    // Phase switches
     private func schedulePhaseEnd() {
         timerTask = Task { @MainActor in
             let remaining = currentPhase.duration - priorElapsed
@@ -134,17 +123,18 @@ final class BrewTimerViewModel {
         }
     }
 
-    @MainActor
+    @MainActor // the only one to redraw the UI
     private func triggerPhaseTransition() {
         timerState = .transitioning
 
         Task {
             if isLastPhase {
-                try? await Task.sleep(for: .seconds(1.5))
-                playCompletionSound()
+                try? await Task.sleep(for: .seconds(0))
+                playPhaseSignal(isCompletion: true)
                 timerState = .finished
+                
             } else {
-                playPhaseSound()
+                playPhaseSignal()
                 try? await Task.sleep(for: .seconds(0))
                 currentPhaseIndex += 1
                 priorElapsed      = 0

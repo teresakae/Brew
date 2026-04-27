@@ -58,7 +58,7 @@ struct Category: View {
                             Text(recipe.name)
                                 .font(.body)
                                 .fontWeight(.semibold)
-                                .foregroundStyle(recipe.name == currentRecipeName ? accent : .primary)
+                                .foregroundStyle(recipe.name == currentRecipeName ? accent : .primary) // if else to change the indicator
                             Text(recipe.category.rawValue)
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)

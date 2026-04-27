@@ -9,14 +9,15 @@ import Foundation
 import SwiftUI
 import SwiftData
 
-// MARK: - Countdown Ring
 struct CountdownRingView: View {
     let viewModel: BrewTimerViewModel
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 60.0)) { context in
+        TimelineView(.animation(minimumInterval: 1.0 / 60.0)) // redraws the screen in 60 fps
+            { context in
             let metrics = calculateMetrics(at: context.date)
-
+            // asks the brain on where we're at
+                
             ZStack {
                 Circle()
                     .fill(
@@ -45,7 +46,8 @@ struct CountdownRingView: View {
             .frame(width: 260, height: 260)
         }
     }
-
+    
+    // the dashboard (tuple, returns more than 1 value without making a new class/struct)
     private func calculateMetrics(at renderTime: Date) -> (progress: Double, timeString: String) {
         let duration = viewModel.currentPhase.duration
         var elapsed  = viewModel.priorElapsed
@@ -56,14 +58,12 @@ struct CountdownRingView: View {
 
         let clamped   = min(elapsed, duration)
         let remaining = max(duration - clamped, 0)
-        let progress  = duration > 0 ? (clamped / duration) : 1.0
-        let timeStr   = String(format: "%d:%02d", Int(remaining) / 60, Int(remaining) % 60)
-
+        let progress  = duration > 0 ? (clamped / duration) : 1.0 // turns time into % (passes it to view, to know how much to trim the circl)
+        let timeStr   = String(format: "%d:%02d", Int(remaining) / 60, Int(remaining) % 60) // for the time text
         return (progress, timeStr)
     }
 }
 
-// MARK: - Horizontal Phase Tracker
 struct PhaseTrackerView: View {
     let viewModel: BrewTimerViewModel
 
@@ -111,7 +111,6 @@ struct PhaseTrackerView: View {
     }
 }
 
-// MARK: - Phase Chip
 struct PhaseChipView: View {
     let phase: BrewPhase
     let isActive: Bool
@@ -141,9 +140,8 @@ struct PhaseChipView: View {
     }
 }
 
-// MARK: - Controls Row
 struct ControlsRowView: View {
-    let viewModel: BrewTimerViewModel
+    let viewModel: BrewTimerViewModel // links the brains
 
     var body: some View {
         HStack(spacing: 28) {
@@ -161,7 +159,7 @@ struct ControlsRowView: View {
                 enabled: viewModel.timerState != .finished
                       && viewModel.timerState != .transitioning
             ) {
-                viewModel.timerState == .running ? viewModel.pause() : viewModel.start()
+                viewModel.timerState == .running ? viewModel.pause() : viewModel.start() // clicks play
             }
 
             CircleControlButton(
@@ -182,7 +180,7 @@ struct ControlsRowView: View {
     }
 }
 
-// MARK: - Circle Control Button
+// circle buttons
 enum ButtonSize { case small, large }
 
 struct CircleControlButton: View {
@@ -218,7 +216,6 @@ struct CircleControlButton: View {
     }
 }
 
-// MARK: - Finished Overlay
 struct FinishedBannerView: View {
     let onReset: () -> Void
 
@@ -240,7 +237,6 @@ struct FinishedBannerView: View {
     }
 }
 
-// MARK: - Timer View
 struct TimerView: View {
     @Query var recipes: [RecipeItem]
     @Environment(\.modelContext) private var context
@@ -337,6 +333,7 @@ struct TimerView: View {
                 }
             }
             .sheet(isPresented: $showRecipeList) {
+                // passing current recipe
                 Category(currentRecipeName: activeRecipe?.name ?? "") { selected in
                     activeRecipe = selected
                     viewModel = BrewTimerViewModel(phases: selected.phases.sorted { $0.sortOrder < $1.sortOrder })
