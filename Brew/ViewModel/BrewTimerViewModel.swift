@@ -61,6 +61,8 @@ final class BrewTimerViewModel {
     }
 
     func reset() {
+        audioPlayer?.stop()
+        audioPlayer = nil
         timerTask?.cancel()
         currentPhaseIndex = 0
         priorElapsed      = 0
@@ -92,6 +94,9 @@ final class BrewTimerViewModel {
     }
 
     func playPhaseSignal(isCompletion: Bool = false) {
+        audioPlayer?.stop()
+        audioPlayer = nil
+        
         // haptic
         let generator = UINotificationFeedbackGenerator()
         generator.prepare()

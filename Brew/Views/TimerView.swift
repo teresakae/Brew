@@ -39,7 +39,7 @@ struct CountdownRingView: View {
                     .rotationEffect(.degrees(-90))
 
                 Text(metrics.timeString)
-                    .font(.system(size: 56, weight: .regular, design: .rounded))
+                    .font(.system(size: 75, weight: .thin, design: .rounded))
                     .monospacedDigit()
                     .foregroundStyle(.primary)
             }
