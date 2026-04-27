@@ -15,7 +15,14 @@ struct Category: View {
     var onSelect: (RecipeItem) -> Void
 
     var filteredRecipes: [RecipeItem] {
-        guard let selected = selectedCategory else { return recipes }
+        let categoryOrder = BrewCategory.allCases
+        guard let selected = selectedCategory else {
+            return recipes.sorted {
+                let li = categoryOrder.firstIndex(of: $0.category) ?? Int.max
+                let ri = categoryOrder.firstIndex(of: $1.category) ?? Int.max
+                return li != ri ? li < ri : $0.name < $1.name
+            }
+        }
         return recipes.filter { $0.category == selected }
     }
 
@@ -112,8 +119,8 @@ struct Category: View {
             }
     }
 }
-
-#Preview {
-    Category(currentRecipeName: "Classic French Press", onSelect: { _ in })
-        .modelContainer(for: RecipeItem.self, inMemory: true)
-}
+//
+//#Preview {
+//    Category(currentRecipeName: "Classic French Press", onSelect: { _ in })
+//        .modelContainer(for: RecipeItem.self, inMemory: true)
+//}

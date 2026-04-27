@@ -43,7 +43,7 @@ extension BrewPhase {
         BrewPhase(
             name: "Bloom",
             duration: 30,
-            instruction: "Pour 50ml in slow circles, let the bed expand",
+            instruction: "Pour 50ml in slow circles, make sure all grounds are wet",
             ingredientAmount: 50
         ),
         BrewPhase(
@@ -63,6 +63,27 @@ extension BrewPhase {
             duration: 60,
             instruction: "Let remaining water drain fully through the filter",
             ingredientAmount: nil
+        ),
+    ]
+
+    static var chemexSample: [BrewPhase] = [
+        BrewPhase(
+            name: "Bloom",
+            duration: 45,
+            instruction: "Pour 100ml in circular motion, make sure all grounds are saturated",
+            ingredientAmount: 100
+        ),
+        BrewPhase(
+            name: "First Pour",
+            duration: 75,
+            instruction: "Pour 200ml slowly in circular motion, keep water level steady",
+            ingredientAmount: 200
+        ),
+        BrewPhase(
+            name: "Final Pour",
+            duration: 120,
+            instruction: "Pour remaining 225ml slowly, let it drain completely",
+            ingredientAmount: 225
         ),
     ]
 
@@ -89,6 +110,27 @@ extension BrewPhase {
             name: "Press",
             duration: 30,
             instruction: "Press slowly and steadily for 30 seconds, stop at hiss",
+            ingredientAmount: nil
+        ),
+    ]
+    
+    static var mokapotSample: [BrewPhase] = [
+        BrewPhase(
+            name: "Heat",
+            duration: 180,
+            instruction: " Place bottom chamber with 150ml hot water and basket with 15g coffee leveled on stove over medium-low heat, leave lid open",
+            ingredientAmount: nil
+        ),
+        BrewPhase(
+            name: "Flow",
+            duration: 90,
+            instruction: "Coffee starts flowing into upper chamber",
+            ingredientAmount: nil
+        ),
+        BrewPhase(
+            name: "Remove",
+            duration: 30,
+            instruction: "Stream turns honey color, remove from heat immediately and when the bubbling stops pour immediately to serve",
             ingredientAmount: nil
         ),
     ]
