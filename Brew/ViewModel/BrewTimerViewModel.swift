@@ -43,6 +43,13 @@ final class BrewTimerViewModel {
 
     init(phases: [BrewPhase]) {
         self.phases = phases
+        //trying to override the silent mode
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+            try AVAudioSession.sharedInstance().setActive(true)
+            } catch {
+                print("Audio session error: \(error)")
+            }
     }
 
     // Functions
