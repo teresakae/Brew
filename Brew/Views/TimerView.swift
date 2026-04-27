@@ -376,14 +376,14 @@ struct TimerView: View {
         let samples: [RecipeItem] = [
             RecipeItem(name: "Classic French Press", category: .frenchPress,
                        phases: BrewPhase.frenchPressSample, coffeeGrams: 25, waterMl: 250),
-            RecipeItem(name: "V60", category: .pourOver,
-                       phases: BrewPhase.v60Sample, coffeeGrams: 15, waterMl: 250),
             RecipeItem(name: "Chemex", category: .pourOver,
-                       phases: BrewPhase.v60Sample, coffeeGrams: 35, waterMl: 525),
+                       phases: BrewPhase.chemexSample, coffeeGrams: 35, waterMl: 525),
             RecipeItem(name: "Classic Aero Press", category: .aeroPress,
                        phases: BrewPhase.aeropressSample, coffeeGrams: 18, waterMl: 200),
             RecipeItem(name: "Classic Moka Pot", category: .mokaPot,
-                       phases: BrewPhase.mokapotSample, coffeeGrams: 15, waterMl: 150)
+                       phases: BrewPhase.mokapotSample, coffeeGrams: 15, waterMl: 150),
+            RecipeItem(name: "V60", category: .pourOver,
+                       phases: BrewPhase.v60Sample, coffeeGrams: 15, waterMl: 250),
         ]
         samples.forEach { context.insert($0) }
     }
