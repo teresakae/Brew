@@ -224,7 +224,7 @@ struct Recipes: View {
     }
 }
 
-#Preview {
-    Recipes(mode: .add)
-        .modelContainer(for: RecipeItem.self, inMemory: true)
-}
+//#Preview {
+//    Recipes(mode: .add)
+//        .modelContainer(for: RecipeItem.self, inMemory: true)
+//}

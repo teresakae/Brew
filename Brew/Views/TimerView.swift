@@ -69,34 +69,39 @@ struct PhaseTrackerView: View {
 
     var body: some View {
         ScrollViewReader { proxy in
-            ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(spacing: 20) {
-                    ForEach(viewModel.phases.indices, id: \.self) { index in
-                        let phase = viewModel.phases[index]
+            GeometryReader { geo in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    LazyHStack(spacing: 20) {
+                        ForEach(viewModel.phases.indices, id: \.self) { index in
+                            let phase = viewModel.phases[index]
 
-                        PhaseChipView(
-                            phase: phase,
-                            isActive: isActive(index),
-                            isCompleted: isCompleted(index)
-                        )
-                        .id(index)
-                        .onTapGesture {
-                            withAnimation(.easeInOut(duration: 0)) {
-                                viewModel.jumpToPhase(at: index)
+                            PhaseChipView(
+                                phase: phase,
+                                isActive: isActive(index),
+                                isCompleted: isCompleted(index)
+                            )
+                            .id(index)
+                            .onTapGesture {
+                                withAnimation(.easeInOut(duration: 0)) {
+                                    viewModel.jumpToPhase(at: index)
+                                }
                             }
                         }
                     }
+                    .scrollTargetLayout()
+                    .padding(.horizontal, 24)
+                    //force the geo to be as wide as the screen
+                    .frame(minWidth: geo.size.width, alignment: .center)
                 }
-                .scrollTargetLayout()
-                .padding(.horizontal, 24)
-            }
-            .scrollTargetBehavior(.viewAligned)
-            .frame(height: 60)
-            .onChange(of: viewModel.currentPhaseIndex) { _, newIndex in
-                withAnimation(.easeInOut(duration: 0.35)) {
-                    proxy.scrollTo(newIndex, anchor: .center)
+                .scrollTargetBehavior(.viewAligned)
+                .frame(height: 60)
+                .onChange(of: viewModel.currentPhaseIndex) { _, newIndex in
+                    withAnimation(.easeInOut(duration: 0.35)) {
+                        proxy.scrollTo(newIndex, anchor: .center)
+                    }
                 }
             }
+            .frame(height: 60) //expand to fill all available space, if not it can ngambil smua height yg di vstack dan bkin layout jelek
         }
     }
 
@@ -255,6 +260,8 @@ struct TimerView: View {
                         Text("\(recipe.coffeeGrams)g · \(recipe.waterMl)ml · \(recipe.formattedTotalTime)")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity)
+                            .multilineTextAlignment(.center)
                             .padding(.bottom, 28)
                     }
 
@@ -274,8 +281,9 @@ struct TimerView: View {
                         .font(.callout)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
+                        .lineLimit(3)
                         .padding(.horizontal, 32)
-                        .frame(height: 60, alignment: .top)
+                        .frame(height: 72, alignment: .top)
                         .id(viewModel.currentPhaseIndex)
                         .animation(.easeInOut(duration: 0.35), value: viewModel.currentPhaseIndex)
 
@@ -370,8 +378,12 @@ struct TimerView: View {
                        phases: BrewPhase.frenchPressSample, coffeeGrams: 25, waterMl: 250),
             RecipeItem(name: "V60", category: .pourOver,
                        phases: BrewPhase.v60Sample, coffeeGrams: 15, waterMl: 250),
+            RecipeItem(name: "Chemex", category: .pourOver,
+                       phases: BrewPhase.v60Sample, coffeeGrams: 35, waterMl: 525),
             RecipeItem(name: "Classic Aero Press", category: .aeroPress,
-                       phases: BrewPhase.aeropressSample, coffeeGrams: 18, waterMl: 200)
+                       phases: BrewPhase.aeropressSample, coffeeGrams: 18, waterMl: 200),
+            RecipeItem(name: "Classic Moka Pot", category: .mokaPot,
+                       phases: BrewPhase.mokapotSample, coffeeGrams: 15, waterMl: 150)
         ]
         samples.forEach { context.insert($0) }
     }
